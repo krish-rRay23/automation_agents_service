@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from .. import auth
 from ..auth import get_current_user
 from fastapi import status
+import requests
 
 router = APIRouter()
 
@@ -32,3 +33,10 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
 @router.get("/me", response_model=schemas.UserOut)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+@router.get("/trigger-n8n")
+def trigger_n8n():
+    url = "http://localhost:5678/webhook-test/test-webhook"
+    payload = {"message": "Hello from FastAPI 🚀"}
+    response = requests.post(url, json=payload)
+    return {"status": "Webhook triggered", "n8n_response": response.text}
